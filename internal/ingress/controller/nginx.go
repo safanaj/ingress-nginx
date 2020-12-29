@@ -762,7 +762,8 @@ func (n *NGINXController) setupSSLProxy() {
 		klog.Fatalf("%v", err)
 	}
 
-	proxyList := &proxyproto.Listener{Listener: listener, ProxyHeaderTimeout: cfg.ProxyProtocolHeaderTimeout}
+	// proxyList := &proxyproto.Listener{Listener: listener, ProxyHeaderTimeout: cfg.ProxyProtocolHeaderTimeout}
+	proxyList := &proxyproto.Listener{Listener: listener}
 
 	// accept TCP connections on the configured HTTPS port
 	go func() {
@@ -774,6 +775,12 @@ func (n *NGINXController) setupSSLProxy() {
 				// wrap the listener in order to decode Proxy
 				// Protocol before handling the connection
 				conn, err = proxyList.Accept()
+				readDeadLine := time.Now().Add(cfg.ProxyProtocolHeaderTimeout)
+				conn.SetReadDeadline(readDeadLine)
+				// this is just to read the header in a controlled way, to be able to reset the timeout
+				// after it
+				conn.(*proxyproto.Conn).ProxyHeader()
+				conn.SetReadDeadline(time.Time{})
 			} else {
 				conn, err = listener.Accept()
 			}

@@ -35,8 +35,8 @@ import (
 	"text/template"
 	"time"
 
-	proxyproto "github.com/armon/go-proxyproto"
 	"github.com/eapache/channels"
+	proxyproto "github.com/pires/go-proxyproto"
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/sets"
